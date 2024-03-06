@@ -1,0 +1,1 @@
+An AWS Lambda function which GETs an HTTP endpoint on a repeating periodic cycle, and prints the data obtained to cloud logs.

@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda setup using SAM and cloudformation
+Parameters:
+  functionName:
+    Description: The name of the lambda function
+    Type: String
+    MinLength: 1
+    MaxLength: 30
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Ref: functionName
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      PackageType: Zip
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.10
+      CodeUri: s3://testbucket700fdbaad614bf1b/c06da92f85ec6e9fb3747790ea7df179
+      Description: A GET function
+      Timeout: 10
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AWSLambda_ReadOnlyAccess
