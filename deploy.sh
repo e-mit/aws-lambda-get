@@ -14,8 +14,10 @@ BUCKET_NAME="testbucket$RAND_ID" # Lower case only
 echo Make an S3 bucket
 aws s3 mb s3://$BUCKET_NAME
 
-rm -rf function/__pycache__
+echo Create the python packages: zipping is done automatically later
+rm -rf package function/__pycache__
 rm -f function/*.pyc out.yml
+pip3 install --target package/python -r requirements.txt
 
 echo Zip and upload the lambda code to the S3 bucket
 # This returns an edited template with the S3 paths in place
@@ -39,12 +41,16 @@ read -p "Press any key to continue... " -n1 -s; echo
 echo Delete the S3 bucket
 aws s3 rb --force s3://$BUCKET_NAME
 
-echo Invoke the lambda
-aws lambda invoke \
---function-name $FUNCTION_NAME \
---cli-binary-format raw-in-base64-out \
---payload '{"time": "1970-01-01T00:00:00Z"}' \
-temp && cat temp; echo; rm -f temp
+echo Invoke the lambda twice
+for i in {1..2}
+do
+    aws lambda invoke \
+    --function-name $FUNCTION_NAME \
+    --cli-binary-format raw-in-base64-out \
+    --payload '{"time": "1970-01-01T00:00:00Z"}' \
+    temp && cat temp; echo; rm -f temp
+    sleep 2
+done
 
 read -p "Press any key to continue... " -n1 -s; echo
 

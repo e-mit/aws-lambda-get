@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: Lambda setup using SAM and cloudformation
+Description: Lambda to do HTTP GET
 Parameters:
   functionName:
     Description: The name of the lambda function
@@ -25,3 +25,15 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambda_ReadOnlyAccess
+      Layers:
+        - Ref: libs
+  libs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: package-layer
+      Description: Python packages used by the lambda.
+      ContentUri: package
+      CompatibleArchitectures:
+        - x86_64
+      CompatibleRuntimes:
+        - python3.10
