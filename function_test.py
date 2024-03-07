@@ -1,9 +1,12 @@
 import unittest
 import logging
-from function import lambda_function
+import sys
+
+sys.path.append("function")
+
+from function import lambda_function  # noqa
 
 logger = logging.getLogger()
-
 handler = lambda_function.lambda_handler
 
 
@@ -14,7 +17,6 @@ class TestFunction(unittest.TestCase):
         logger.info(f'Test event: {event}')
         context = {'requestid': '1234'}
         result = handler(event, context)
-        print(type(result))
         print(str(result))
         self.assertIn("data", result)
         self.assertEqual(len(result['data']), 1)

@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from . import get_request
+import get_request
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
