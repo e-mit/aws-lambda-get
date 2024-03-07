@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Deploy a template file which uses SAM syntax/transform, using the
+# Deploy the template file which uses SAM syntax/transform, using the
 # AWS CloudFormation CLI and without using the SAM CLI.
 # This necessarily involves a brief S3 usage.
+# Then invoke the function, then delete all resources used.
+
+# Prevent terminal output waiting:
+export AWS_PAGER=""
 
 # NB: some of these names must be alphanumeric only
 RAND_ID=$(dd if=/dev/random bs=8 count=1 2>/dev/null \
@@ -10,6 +14,9 @@ RAND_ID=$(dd if=/dev/random bs=8 count=1 2>/dev/null \
 FUNCTION_NAME="testFunction$RAND_ID"
 STACK_NAME="testStack$RAND_ID"
 BUCKET_NAME="testbucket$RAND_ID" # Lower case only
+
+echo Making $STACK_NAME
+echo
 
 echo Make an S3 bucket
 aws s3 mb s3://$BUCKET_NAME
