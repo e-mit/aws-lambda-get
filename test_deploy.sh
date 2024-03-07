@@ -14,6 +14,7 @@ RAND_ID=$(dd if=/dev/random bs=8 count=1 2>/dev/null \
 FUNCTION_NAME="testFunction$RAND_ID"
 STACK_NAME="testStack$RAND_ID"
 BUCKET_NAME="testbucket$RAND_ID" # Lower case only
+LAYER_NAME=$FUNCTION_NAME-layer
 
 echo Making $STACK_NAME
 echo
@@ -63,6 +64,25 @@ read -p "Press any key to continue... " -n1 -s; echo
 
 echo "Delete the stack and all its resources (lambda and role)"
 aws cloudformation delete-stack --stack-name $STACK_NAME
+
+# Note that the layer(s) are not included in the stack.
+echo "Delete layer (all versions)"
+while true; do
+VERSION=$(aws lambda list-layer-versions \
+--layer-name $LAYER_NAME | \
+python3 -c "import sys, json
+try:
+    print(json.load(sys.stdin)['LayerVersions'][0]['Version'])
+except:
+    exit(1)")
+if [[ "$?" -ne 0 ]]; then
+    break
+fi
+echo Deleting layer $LAYER_NAME:$VERSION
+aws lambda delete-layer-version \
+--layer-name $LAYER_NAME \
+--version-number $VERSION
+done
 
 echo "Delete the log group (was automatically created but is not in the stack)"
 aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME

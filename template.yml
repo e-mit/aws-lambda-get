@@ -30,7 +30,12 @@ Resources:
   libs:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: package-layer
+      # Form a layer name like <function name>-layer
+      LayerName:
+        !Join
+        - '-'
+        - - !Ref functionName
+          - 'layer'
       Description: Python packages used by the lambda.
       ContentUri: package
       CompatibleArchitectures:
