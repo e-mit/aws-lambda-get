@@ -14,8 +14,10 @@ class TestFunction(unittest.TestCase):
         logger.info(f'Test event: {event}')
         context = {'requestid': '1234'}
         result = handler(event, context)
+        print(type(result))
         print(str(result))
-        self.assertEqual(str(result), 'hello')
+        self.assertIn("data", result)
+        self.assertEqual(len(result['data']), 1)
 
 
 if __name__ == '__main__':
