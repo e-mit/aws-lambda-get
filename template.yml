@@ -27,6 +27,17 @@ Resources:
         - AWSLambda_ReadOnlyAccess
       Layers:
         - Ref: libs
+      Events:
+        ScheduledEvent:
+          Type: ScheduleV2
+          Description: Run the Lambda on a repeating schedule
+          Properties:
+            ScheduleExpression: "rate(1 minute)"
+            Name:
+              !Join
+              - '-'
+              - - !Ref functionName
+                - 'schedule'
   libs:
     Type: AWS::Serverless::LayerVersion
     Properties:
