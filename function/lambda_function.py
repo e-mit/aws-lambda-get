@@ -12,7 +12,7 @@ logger.setLevel(LOG_LEVEL)
 logger.info(f'Getting {GET_URL} with timeout={GET_TIMEOUT_SEC} s')
 
 
-def lambda_handler(event, context) -> str:
+def lambda_handler(event, context) -> dict:
     logger.debug(f'Event: {event}')
 
     response = requests.get(GET_URL, timeout=GET_TIMEOUT_SEC)
@@ -23,5 +23,6 @@ def lambda_handler(event, context) -> str:
             pass
         raise ValueError("Bad status code")
 
-    logger.debug(f'Response: {response.text}')
-    return response.text
+    response_json = response.json()
+    logger.debug(f'Response: {response_json}')
+    return response_json

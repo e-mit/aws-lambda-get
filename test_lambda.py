@@ -2,7 +2,6 @@ import unittest
 import os
 import sys
 import importlib
-import json
 
 import requests
 
@@ -30,8 +29,7 @@ class TestFunction(unittest.TestCase):
     def test_get(self):
         self.GET_URL = 'https://api.carbonintensity.org.uk/intensity'
         self.reload()
-        result = lambda_function.lambda_handler(self.event, self.context)
-        result_obj = json.loads(result)
+        result_obj = lambda_function.lambda_handler(self.event, self.context)
         self.assertIn('data', result_obj)
         self.assertEqual(len(result_obj['data']), 1)
         self.assertIn('intensity', result_obj['data'][0])
