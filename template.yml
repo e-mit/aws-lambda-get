@@ -1,13 +1,41 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: Lambda to do HTTP GET
+Description: Create a Lambda to do a periodic HTTP GET and put the result in a SQS
 Parameters:
   functionName:
     Description: The name of the lambda function
     Type: String
     MinLength: 1
-    MaxLength: 30
+    MaxLength: 50
+  timePeriod:
+    Description: "The time period of the scheduled event, e.g. '1 minute'"
+    Type: String
+    MinLength: 1
+    MaxLength: 50
+  queueARN:
+    Description: The ARN of the SQS queue
+    Type: String
+    MinLength: 1
+    MaxLength: 200
+  timeout:
+    Description: Timeout in seconds for the lambda
+    Type: Number
+    MinValue: 1
+    Default: 10
+
 Resources:
+
+  accessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allow lambda to write to SQS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 'sqs:SendMessage'
+            Resource: !Ref queueARN
+
   function:
     Type: AWS::Serverless::Function
     Properties:
@@ -20,24 +48,38 @@ Resources:
       Handler: lambda_function.lambda_handler
       Runtime: python3.10
       CodeUri: function
-      Description: A GET function
-      Timeout: 10
+      Description: Do a periodic HTTP GET and put the result in a SQS
+      Timeout: !Ref timeout
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambda_ReadOnlyAccess
+        - !GetAtt accessPolicy.Arn
       Layers:
         - Ref: libs
       Events:
         ScheduledEvent:
           Type: ScheduleV2
-          Description: Run the Lambda on a repeating schedule
+          Description: Repeating trigger for the Lambda
           Properties:
-            ScheduleExpression: "rate(1 minute)"
+            ScheduleExpression:
+              !Join
+              - ''
+              - - 'rate('
+                - !Ref timePeriod
+                - ')'
             Name:
               !Join
               - '-'
               - - !Ref functionName
                 - 'schedule'
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 60
+        MaximumRetryAttempts: 2
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            Destination: !Ref queueARN
+
   libs:
     Type: AWS::Serverless::LayerVersion
     Properties:
