@@ -44,4 +44,19 @@ timeout=$LAMBDA_TIMEOUT_SEC"
 aws lambda update-function-configuration \
 --function-name $FUNCTION_NAME \
 --environment "Variables={LOG_LEVEL=$LOG_LEVEL, \
-GET_URL=$GET_URL, GET_TIMEOUT_SEC=$GET_TIMEOUT_SEC}"
+GET_URL=$GET_URL, GET_TIMEOUT_SEC=$GET_TIMEOUT_SEC}" &> /dev/null
+
+# Now enable the lambda's schedule, preserving the other parameters:
+NEW_SCHEDULE_FILE=new_sched_temp.json
+aws scheduler get-schedule \
+--name $FUNCTION_NAME-schedule | \
+python3 -c \
+"import sys, json
+sched = json.load(sys.stdin)
+new_sched = {'State': 'ENABLED'}
+for k in ['FlexibleTimeWindow','ScheduleExpression','Target','Name']:
+    new_sched[k] = sched[k]
+print(json.dumps(new_sched))" > $NEW_SCHEDULE_FILE
+aws scheduler update-schedule \
+--cli-input-json file://$NEW_SCHEDULE_FILE &> /dev/null
+rm -f $NEW_SCHEDULE_FILE

@@ -66,6 +66,7 @@ Resources:
           Type: ScheduleV2
           Description: Repeating trigger for the Lambda
           Properties:
+            State: DISABLED
             ScheduleExpression:
               !Join
               - ''
