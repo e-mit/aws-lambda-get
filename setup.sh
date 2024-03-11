@@ -9,6 +9,14 @@ CYCLE_PERIOD='1 minute'
 # Name of the SQS queue for output:
 QUEUE_NAME="test1Stackddfa8b-queue-Cmn2pmetTKtl"
 
+# Lambda timeout:
+LAMBDA_TIMEOUT_SEC=10
+
+# Parameters for the GET function:
+LOG_LEVEL='DEBUG'
+GET_URL="https://api.carbonintensity.org.uk/intensity"
+GET_TIMEOUT_SEC=5
+
 ####################################################
 
 source create.sh clean
@@ -27,4 +35,11 @@ python3 -c \
 print(json.load(sys.stdin)['Attributes']['QueueArn'])")
 
 source create.sh stack \
-"timePeriod=$CYCLE_PERIOD queueARN=$QUEUE_ARN"
+"timePeriod=$CYCLE_PERIOD queueARN=$QUEUE_ARN \
+timeout=$LAMBDA_TIMEOUT_SEC"
+
+# Add environment variables to the lambda
+aws lambda update-function-configuration \
+--function-name $FUNCTION_NAME \
+--environment "Variables={LOG_LEVEL=$LOG_LEVEL, \
+GET_URL=$GET_URL, GET_TIMEOUT_SEC=$GET_TIMEOUT_SEC}"
