@@ -3,8 +3,9 @@
 # Name prefix for the resources to be created:
 NAME_PREFIX=testget
 
-# Time period string for the lambda repetition:
-CYCLE_PERIOD='1 minute'
+# Time period for the lambda repetition:
+CYCLE_PERIOD_VALUE=1
+CYCLE_PERIOD_UNIT=minute
 
 # Name of the SQS queue for output:
 QUEUE_NAME="test1Stackddfa8b-queue-Cmn2pmetTKtl"
@@ -35,7 +36,8 @@ python3 -c \
 print(json.load(sys.stdin)['Attributes']['QueueArn'])")
 
 source create.sh stack \
-"timePeriod=$CYCLE_PERIOD queueARN=$QUEUE_ARN \
+"timePeriodValue=$CYCLE_PERIOD_VALUE \
+timePeriodUnit=$CYCLE_PERIOD_UNIT queueARN=$QUEUE_ARN \
 timeout=$LAMBDA_TIMEOUT_SEC"
 
 # Add environment variables to the lambda

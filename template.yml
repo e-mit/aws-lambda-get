@@ -7,8 +7,13 @@ Parameters:
     Type: String
     MinLength: 1
     MaxLength: 50
-  timePeriod:
-    Description: "The time period of the scheduled event, e.g. '1 minute'"
+  timePeriodValue:
+    Description: "The time period of the scheduled event (without unit)"
+    Type: Number
+    MinValue: 1
+    MaxValue: 255
+  timePeriodUnit:
+    Description: "The unit for the time period of the scheduled event, e.g. 'minute'"
     Type: String
     MinLength: 1
     MaxLength: 50
@@ -53,7 +58,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambda_ReadOnlyAccess
-        - !GetAtt accessPolicy.Arn
+        - !Ref accessPolicy
       Layers:
         - Ref: libs
       Events:
@@ -65,7 +70,9 @@ Resources:
               !Join
               - ''
               - - 'rate('
-                - !Ref timePeriod
+                - !Ref timePeriodValue
+                - ' '
+                - !Ref timePeriodUnit
                 - ')'
             Name:
               !Join
