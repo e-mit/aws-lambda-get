@@ -3,9 +3,9 @@ import os
 
 import requests
 
-LOG_LEVEL = os.environ['LOG_LEVEL']
-GET_URL = os.environ['GET_URL']
-GET_TIMEOUT_SEC = int(os.environ['GET_TIMEOUT_SEC'])
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
+GET_URL = os.getenv('GET_URL', '')
+GET_TIMEOUT_SEC = float(os.getenv('GET_TIMEOUT_SEC', '5'))
 
 logger = logging.getLogger()
 logger.setLevel(LOG_LEVEL)
