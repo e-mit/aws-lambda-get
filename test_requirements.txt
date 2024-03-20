@@ -1,1 +1,13 @@
 types-requests==2.31.0.20240218
+bandit==1.7.8
+coverage==7.4.4
+flake8==7.0.0
+mypy==1.9.0
+mypy-extensions==1.0.0
+pycodestyle==2.11.1
+pydocstyle==6.3.0
+pyflakes==3.2.0
+pylint==3.1.0
+pyright==1.1.355
+pytest==8.1.1
+pytest-cov==4.1.0
