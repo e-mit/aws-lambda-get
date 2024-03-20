@@ -4,3 +4,6 @@ package/
 out.yml
 *.zip
 id.txt
+.coverage
+.vscode
+__pycache__
