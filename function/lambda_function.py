@@ -1,3 +1,5 @@
+"""An AWS Lambda to GET data from an HTTP endpoint."""
+
 import logging
 import os
 from typing import Any
@@ -14,14 +16,12 @@ logger.info('Getting %s with timeout=%s s', GET_URL, GET_TIMEOUT_SEC)
 
 
 def lambda_handler(event: Any, _context_unused: Any) -> Any:
+    """Define the lambda function."""
     logger.debug('Event: %s', event)
 
     response = requests.get(GET_URL, timeout=GET_TIMEOUT_SEC)
     if response.status_code != 200:
-        try:
-            logger.error('Get failed; response: %s', response)
-        except Exception:
-            pass
+        logger.error('Get failed; response: %s', response)
         raise ValueError("Bad status code")
 
     response_json = response.json()
