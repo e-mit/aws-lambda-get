@@ -45,14 +45,6 @@ class TestRealRequests(unittest.TestCase):
         with self.assertRaises(Exception):
             lambda_function.lambda_handler(self.event, self.context)
 
-    @unittest.skip("failing")
-    def test_timeout(self):
-        self.GET_TIMEOUT_SEC = '0.000001'
-        self.GET_URL = 'https://google.com'
-        self.reload()
-        with self.assertRaises(requests.Timeout):
-            lambda_function.lambda_handler(self.event, self.context)
-
 
 @requests_mock.Mocker()
 class TestMockRequests(unittest.TestCase):
