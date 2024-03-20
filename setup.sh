@@ -5,8 +5,6 @@
 
 ####################################################
 
-source create.sh clean
-
 # Get the queue ARN by converting the name to a URL then to an ARN
 QUEUE_URL=$(aws sqs list-queues \
 --queue-name-prefix $QUEUE_NAME | \
@@ -22,7 +20,7 @@ python3 -c \
 print(json.load(sys.stdin)['Attributes']['QueueArn'])")
 
 # Create all resources but without enabling the lambda schedule
-source create.sh stack \
+source stack.sh $STACK_NAME create \
 "timePeriodValue=$CYCLE_PERIOD_VALUE \
 timePeriodUnit=$CYCLE_PERIOD_UNIT queueARN=$QUEUE_ARN \
 timeout=$LAMBDA_TIMEOUT_SEC"

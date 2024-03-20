@@ -1,8 +1,8 @@
 # Example parameters for creating an instance of this stack.
 # Source this script, then run setup.sh
 
-# Name prefix for all resources to be created:
-NAME_PREFIX=testget2
+# Name of the stack to create (and the name prefix for all resources to be created):
+STACK_NAME=teststack1
 
 # Time period for the lambda repetition:
 CYCLE_PERIOD_VALUE=1
