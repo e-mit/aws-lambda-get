@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Any
 
 import requests
 
@@ -9,20 +10,20 @@ GET_TIMEOUT_SEC = float(os.getenv('GET_TIMEOUT_SEC', '5'))
 
 logger = logging.getLogger()
 logger.setLevel(LOG_LEVEL)
-logger.info(f'Getting {GET_URL} with timeout={GET_TIMEOUT_SEC} s')
+logger.info('Getting %s with timeout=%s s', GET_URL, GET_TIMEOUT_SEC)
 
 
-def lambda_handler(event, context) -> dict:
-    logger.debug(f'Event: {event}')
+def lambda_handler(event: Any, _context_unused: Any) -> Any:
+    logger.debug('Event: %s', event)
 
     response = requests.get(GET_URL, timeout=GET_TIMEOUT_SEC)
     if response.status_code != 200:
         try:
-            logger.error(f'Get failed; response: {response}')
+            logger.error('Get failed; response: %s', response)
         except Exception:
             pass
         raise ValueError("Bad status code")
 
     response_json = response.json()
-    logger.debug(f'Response: {response_json}')
+    logger.debug('Response: %s', response_json)
     return response_json
