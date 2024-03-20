@@ -1,1 +1,1 @@
-../aws_lambda_db/create.sh
+../aws-lambda-db/create.sh
