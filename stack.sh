@@ -1,58 +1,58 @@
 #!/bin/bash
-# Version 1.0.0
+# Version 2.0.0
 
 # A script to create an AWS Lambda function within a Cloudformation stack.
 
-# Run this script with one of the following input arguments:
-entryFuncs=("clean" "stack" "update_function" "update_layer" "loglevel")
+# Run this script like:
+# ./stack.sh <stack name> <command> <3rd argument>
 
-# Additional arguments:
-#   "stack": Optional 2nd argument is a space-separated list
+# Where "command" is one of the following:
+entryFuncs=("delete" "create" "update_function" "update_layer" "loglevel")
+
+# "delete": Delete the existing stack and all of its resources.
+# "create": Create the stack. An error occurs if a stack already
+#           exists with the provided name, and no update occurs.
+# "update_function": Update just the lambda definition.
+# "update_layer": Update just the python dependency package layer.
+# "loglevel": Change the lambda logging level.
+
+# Possible 3rd arguments:
+#   "stack": Optional 3rd argument is a space-separated list
 #            of parameter-overrides to pass to cloudformation
 #            deploy, which become template parameters.
-#   "loglevel": Mandatory 2nd argument is a log level string
+#   "loglevel": Mandatory 3rd argument is a log level string
 #               e.g. INFO, DEBUG, ERROR, etc.
-
-ID_FILE_NAME="id.txt"
 
 ############################################################
 
-ARG2=$2
+STACK_NAME=$1
+ARG3=$3
 
-if [[ -z $NAME_PREFIX ]]; then
-    echo ERROR: Please set NAME_PREFIX
+if [[ -z $STACK_NAME ]]; then
+    echo ERROR: Please set STACK_NAME
     return 1
 else
     # Convert to lower-case
-    NAME_PREFIX_LOWER="$(echo $NAME_PREFIX | tr '[A-Z]' '[a-z]')"
+    STACK_NAME_LOWER="$(echo $STACK_NAME | tr '[A-Z]' '[a-z]')"
 fi
 
 # Prevent terminal output waiting:
 export AWS_PAGER=""
 
-_make_names() {
-    FUNCTION_NAME="${NAME_PREFIX}Function$RAND_ID"
-    STACK_NAME="${NAME_PREFIX}Stack$RAND_ID"
-    BUCKET_NAME="${NAME_PREFIX_LOWER}bucket$RAND_ID" # Lower case only
-    LAYER_NAME=$FUNCTION_NAME-layer
-}
+_check_for_existing_stack() {
+    aws cloudformation describe-stacks \
+    --stack-name $STACK_NAME >/dev/null 2>&1
 
-_get_id() {
-    if [ -f $ID_FILE_NAME ]; then
-        RAND_ID=$(cat $ID_FILE_NAME)
-        _make_names
-        echo "Found $STACK_NAME"
-        return 0
+    if [[ "$?" -eq 0 ]]; then
+        echo "ERROR: stack $STACK_NAME already exists. The stack was not updated."
+        return 1
     fi
-    return 1
 }
 
-_make_id() {
-    RAND_ID=$(dd if=/dev/random bs=3 count=1 2>/dev/null \
-                | od -An -tx1 | tr -d ' \t\n')
-    echo $RAND_ID > $ID_FILE_NAME
-    _make_names
-    echo "Creating $STACK_NAME with Lambda $FUNCTION_NAME"
+_make_names() {
+    FUNCTION_NAME="${STACK_NAME}-function"
+    BUCKET_NAME="${STACK_NAME_LOWER}-bucket" # Lower case only
+    LAYER_NAME=$FUNCTION_NAME-layer
 }
 
 _delete_files() {
@@ -60,42 +60,38 @@ _delete_files() {
     rm -f function/*.pyc out.yml *.zip
 }
 
-clean() {
-    echo "Deleting the stack, resources (lambda and role) and temporary files"
+delete() {
+    _delete_files
+    _make_names
+    echo "Deleting stack $STACK_NAME and its resources (lambda and role)..."
 
-    if _get_id ; then
-        aws cloudformation delete-stack --stack-name $STACK_NAME
+    aws cloudformation delete-stack --stack-name $STACK_NAME
+    if [[ "$?" -eq 0 ]]; then
+        echo "Deleted $STACK_NAME"
+    fi
 
-        if [[ "$?" -eq 0 ]]; then
-            echo "Deleted $STACK_NAME"
-        fi
-
-        # Note that the layer(s) are not included in the stack.
-        echo "Deleting layer (all versions)..."
-        while true; do
-        VERSION=$(aws lambda list-layer-versions \
-        --layer-name $LAYER_NAME | \
-        python3 -c \
+    # Note that the layer(s) are not included in the stack.
+    while true; do
+    VERSION=$(aws lambda list-layer-versions \
+    --layer-name $LAYER_NAME | \
+    python3 -c \
 "import sys, json
 try:
     print(json.load(sys.stdin)['LayerVersions'][0]['Version'])
 except:
     exit(1)")
-        if [[ "$?" -ne 0 ]]; then
-            break
-        fi
-        echo Deleting layer $LAYER_NAME:$VERSION
-        aws lambda delete-layer-version \
-        --layer-name $LAYER_NAME \
-        --version-number $VERSION
-        done
-
-        echo "Delete the log group (was automatically created but is not in the stack)"
-        aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME 2> /dev/null
+    if [[ "$?" -ne 0 ]]; then
+        break
     fi
+    aws lambda delete-layer-version \
+    --layer-name $LAYER_NAME \
+    --version-number $VERSION
+    echo "Deleted layer $LAYER_NAME:$VERSION"
+    done
 
-    _delete_files
-    rm -f $ID_FILE_NAME
+    # Note that the lambda log group is not included in the stack.
+    aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME 2> /dev/null
+    echo "Deleted log group /aws/lambda/$FUNCTION_NAME"
 }
 
 _prepare_packages() {
@@ -107,17 +103,14 @@ _prepare_packages() {
     pip3 install -r test_requirements.txt &> /dev/null
 }
 
-stack() {
-    if _get_id ; then
-        echo "Error: a stack id file already exists: please rename or clean"
-        return 1
-    fi
-    _make_id
-
-    echo Making temporary S3 bucket $BUCKET_NAME
-    aws s3 mb s3://$BUCKET_NAME
-
+create() {
+    _make_names
+    _check_for_existing_stack
     _prepare_packages
+    echo "Creating $STACK_NAME with Lambda $FUNCTION_NAME..."
+
+    aws s3 mb s3://$BUCKET_NAME
+    echo Made temporary S3 bucket $BUCKET_NAME
 
     aws cloudformation package \
     --template-file template.yml \
@@ -128,30 +121,27 @@ stack() {
     --template-file out.yml \
     --stack-name $STACK_NAME \
     --capabilities CAPABILITY_NAMED_IAM \
-    --parameter-overrides functionName=$FUNCTION_NAME $ARG2
+    --parameter-overrides functionName=$FUNCTION_NAME $ARG3
 
-    echo Deleting the temporary S3 bucket
     aws s3 rb --force s3://$BUCKET_NAME
+    echo Deleted the temporary S3 bucket
 }
 
 loglevel() {
-    if ! _get_id ; then
-        echo "No stack id file found."
-        return 1
-    fi
+    _make_names
 
-    if [[ -z $ARG2 ]]; then
+    if [[ -z $ARG3 ]]; then
         echo "ERROR: log level string is required (INFO, DEBUG, etc.)"
         return 1
     fi
 
-    export ARG2
+    export ARG3
     ENV_VARS=$(aws lambda get-function-configuration \
     --function-name $FUNCTION_NAME | \
     python3 -c \
     "import sys, json, os
 environment = json.load(sys.stdin)['Environment']
-environment['Variables']['LOG_LEVEL'] = os.environ['ARG2']
+environment['Variables']['LOG_LEVEL'] = os.environ['ARG3']
 print(json.dumps(environment))")
 
     aws lambda update-function-configuration \
@@ -159,16 +149,12 @@ print(json.dumps(environment))")
     --environment "$ENV_VARS" &> /dev/null
 
     if [[ "$?" -eq 0 ]]; then
-        echo "Set log level to $ARG2"
+        echo "Log level set to $ARG3"
     fi
 }
 
 update_function() {
-    if ! _get_id ; then
-        echo "No stack id file found."
-        return 1
-    fi
-
+    _make_names
     _delete_files
     cd function
     zip -r ../function.zip .
@@ -182,11 +168,7 @@ update_function() {
 }
 
 update_layer() {
-    if ! _get_id ; then
-        echo "No stack id file found."
-        return 1
-    fi
-
+    _make_names
     _prepare_packages
     cd package
     zip -r ../package.zip . &> /dev/null
@@ -212,7 +194,7 @@ update_layer() {
 ok=0
 for i in "${entryFuncs[@]}"
 do
-    if [ "$i" == "$1" ]; then
+    if [ "$i" == "$2" ]; then
         echo "Executing $i()"
         $i
         ok=1
