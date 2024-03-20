@@ -1,14 +1,14 @@
 # Example parameters for creating an instance of this stack.
 # Source this script, then run setup.sh
 
-# Name prefix for the resources to be created:
+# Name prefix for all resources to be created:
 NAME_PREFIX=testget2
 
 # Time period for the lambda repetition:
 CYCLE_PERIOD_VALUE=1
 CYCLE_PERIOD_UNIT=minute
 
-# Name of the SQS queue for output:
+# Name of the existing SQS queue for output:
 QUEUE_NAME="test2Function5407c6-queue"
 
 # Lambda timeout:
