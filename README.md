@@ -10,9 +10,9 @@
 ![pyright](https://github.com/e-mit/aws-lambda-get/actions/workflows/pyright.yml/badge.svg)
 ![bandit](https://github.com/e-mit/aws-lambda-get/actions/workflows/bandit.yml/badge.svg)
 
-Creates an AWS Lambda function which GETs json data from an HTTP endpoint, on a repeating periodic cycle, and puts the data into an AWS SQS queue.
+Creates an AWS Lambda function which GETs json data from an HTTP endpoint, on a repeating periodic schedule, and puts the data into an AWS SQS queue.
 
-This project configures AWS with the CLI and a CloudFormation/SAM template. The SQS queue must already exist.
+This project configures AWS using the CLI with a CloudFormation/SAM template. The SQS queue must already exist.
 
 
 ## See also
@@ -48,16 +48,16 @@ TODO
 
 1. Provide values for the environment variables listed in ```example_config.sh```
 2. Execute script ```setup.sh```. This will create the resources and start the lambda.
-3. Change log level using: ```./create.sh loglevel <log level string e.g. DEBUG>```
-4. Stop the lambda and delete all resources using: ```./create.sh clean```
+3. Change log level using: ```./stack.sh <stack name> loglevel <log level string e.g. DEBUG>```
+4. Stop the lambda and delete all resources using: ```./stack.sh <stack name> delete```
 
 
 ## Development
 
 After deploying the stack, the lambda code and the packaged Python library dependencies can be updated independently, and rapidly, using the following commands:
 
-- Lambda function update: ```./create.sh update_function```
-- Python packages update: ```./create.sh update_layer```
+- Lambda function update: ```./stack.sh <stack name> update_function```
+- Python packages update: ```./stack.sh <stack name> update_layer```
 
 
 ## To do
