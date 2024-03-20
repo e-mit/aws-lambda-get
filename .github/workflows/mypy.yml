@@ -1,0 +1,13 @@
+name: mypy
+
+on: [push]
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare test environment
+        uses: ./.github/actions/prepare-test-environment
+      - name: mypy
+        run: python -m mypy . --exclude 'venv/' --exclude 'package/' --explicit-package-bases

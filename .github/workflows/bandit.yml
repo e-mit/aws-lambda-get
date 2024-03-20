@@ -1,0 +1,13 @@
+name: bandit
+
+on: [push]
+
+jobs:
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare test environment
+        uses: ./.github/actions/prepare-test-environment
+      - name: bandit
+        run: python -m bandit -r . --exclude=/venv/,/package/
