@@ -1,4 +1,4 @@
-"""An AWS Lambda to GET data from an HTTP endpoint."""
+"""An AWS Lambda to GET json data from an HTTP endpoint."""
 
 import logging
 import os
