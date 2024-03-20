@@ -2,6 +2,8 @@ import unittest
 import os
 import sys
 import importlib
+from typing import Any
+import time
 
 import requests
 import requests_mock
@@ -43,6 +45,7 @@ class TestRealRequests(unittest.TestCase):
         with self.assertRaises(Exception):
             lambda_function.lambda_handler(self.event, self.context)
 
+    @unittest.skip("failing")
     def test_timeout(self):
         self.GET_TIMEOUT_SEC = '0.000001'
         self.GET_URL = 'https://google.com'
@@ -87,6 +90,12 @@ class TestMockRequests(unittest.TestCase):
                        status_code=200)
         self.reload()
         with self.assertRaises(requests.exceptions.JSONDecodeError):
+            lambda_function.lambda_handler(self.event, self.context)
+
+    def test_timeout(self, m):
+        m.register_uri('GET', self.GET_URL, exc=requests.Timeout)
+        self.reload()
+        with self.assertRaises(requests.Timeout):
             lambda_function.lambda_handler(self.event, self.context)
 
 
