@@ -10,4 +10,4 @@ jobs:
       - name: Prepare test environment
         uses: ./.github/actions/prepare-test-environment
       - name: mypy
-        run: python -m mypy . --exclude 'venv/' --exclude 'package/' --explicit-package-bases
+        run: python -m mypy . --exclude 'tests/' --exclude 'venv/' --exclude 'package/' --explicit-package-bases

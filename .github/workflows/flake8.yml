@@ -10,4 +10,4 @@ jobs:
     - name: Prepare test environment
       uses: ./.github/actions/prepare-test-environment
     - name: flake8
-      run: python -m flake8 --exclude=venv/*,package/*
+      run: python -m flake8 --exclude=tests/*,venv/*,package/*

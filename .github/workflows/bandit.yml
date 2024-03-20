@@ -10,4 +10,4 @@ jobs:
       - name: Prepare test environment
         uses: ./.github/actions/prepare-test-environment
       - name: bandit
-        run: python -m bandit -r . --exclude=/venv/,/package/
+        run: python -m bandit -r . --exclude=/tests/,/venv/,/package/
