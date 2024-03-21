@@ -1,6 +1,7 @@
 # AWS Lambda GET
 
 ![local tests](https://github.com/e-mit/aws-lambda-get/actions/workflows/tests.yml/badge.svg)
+![cloud tests](https://github.com/e-mit/aws-lambda-get/actions/workflows/cloud-tests.yml/badge.svg)
 ![coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/e-mit/9df92671b4e2859b1e75cf762121b73f/raw/aws-lambda-get.json)
 ![flake8](https://github.com/e-mit/aws-lambda-get/actions/workflows/flake8.yml/badge.svg)
 ![mypy](https://github.com/e-mit/aws-lambda-get/actions/workflows/mypy.yml/badge.svg)
@@ -41,7 +42,7 @@ Run all tests and linting with ```test.sh```
 
 ### Cloud tests
 
-TODO
+Run with ```cloud-tests.sh```
 
 
 ## Deployment
