@@ -56,7 +56,7 @@ _make_names() {
 }
 
 _delete_files() {
-    rm -rf package function/__pycache__ venv
+    rm -rf function/__pycache__
     rm -f function/*.pyc out.yml *.zip
 }
 
@@ -95,7 +95,7 @@ except:
 }
 
 _prepare_packages() {
-    _delete_files
+    rm -rf package venv
     /usr/bin/python3 -m venv venv
     source venv/bin/activate
     pip3 install --target package/python -r requirements.txt &> /dev/null
