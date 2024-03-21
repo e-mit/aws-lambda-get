@@ -26,7 +26,7 @@ sleep 90
 ############ Check events in the queue
 aws sqs receive-message \
 --queue-url $QUEUE_URL \
---max-number-of-messages 1 | python3 tests/cloud_test.py
+--max-number-of-messages 1 | python3 tests/cloud_tests.py
 RESULT=$?
 
 ############ Delete all resources
