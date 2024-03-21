@@ -37,12 +37,12 @@ Tests and linting checks run via GitHub actions after each push. Tests can be ru
 
 ### Local tests
 
-Run all tests and linting with ```test.sh```
+Run all tests and linting with ```local-tests.sh```
 
 
 ### Cloud tests
 
-Run with ```cloud-tests.sh```
+These require AWS CLI authentication. Run with ```cloud-tests.sh```
 
 
 ## Deployment
