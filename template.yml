@@ -67,6 +67,9 @@ Resources:
           Description: Repeating trigger for the Lambda
           Properties:
             State: DISABLED
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 240
             ScheduleExpression:
               !Join
               - ''
@@ -81,7 +84,8 @@ Resources:
               - - !Ref functionName
                 - 'schedule'
       EventInvokeConfig:
-        MaximumEventAgeInSeconds: 60
+        # This applies to async invocations only
+        MaximumEventAgeInSeconds: 240
         MaximumRetryAttempts: 2
         DestinationConfig:
           OnSuccess:
