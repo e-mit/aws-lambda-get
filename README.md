@@ -49,7 +49,7 @@ These require AWS CLI authentication. Run with ```cloud-tests.sh```
 
 1. Provide values for the environment variables listed in ```example_config.sh```
 2. Execute script ```setup.sh```. This will create the resources and start the lambda.
-3. Change log level using: ```./stack.sh <stack name> loglevel <log level string e.g. DEBUG>```
+3. Optional: change log level using: ```./stack.sh <stack name> loglevel <log level string e.g. DEBUG>```
 4. Stop the lambda and delete all resources using: ```./stack.sh <stack name> delete```
 
 
