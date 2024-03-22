@@ -88,10 +88,6 @@ except:
     --version-number $VERSION
     echo "Deleted layer $LAYER_NAME:$VERSION"
     done
-
-    # Note that the lambda log group is not included in the stack.
-    aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME 2> /dev/null
-    echo "Deleted log group /aws/lambda/$FUNCTION_NAME"
 }
 
 _prepare_packages() {

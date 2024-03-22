@@ -37,11 +37,15 @@ aws scheduler get-schedule \
 --name $FUNCTION_NAME-schedule | \
 python3 -c \
 "import sys, json
-sched = json.load(sys.stdin)
-new_sched = {'State': 'ENABLED'}
-for k in ['FlexibleTimeWindow','ScheduleExpression','Target','Name']:
-    new_sched[k] = sched[k]
-print(json.dumps(new_sched))" > $NEW_SCHEDULE_FILE
+try:
+    sched = json.load(sys.stdin)
+    new_sched = {'State': 'ENABLED'}
+    for k in ['FlexibleTimeWindow','ScheduleExpression','Target','Name']:
+        new_sched[k] = sched[k]
+    print(json.dumps(new_sched))
+except Exception:
+    pass
+" > $NEW_SCHEDULE_FILE
 aws scheduler update-schedule \
 --cli-input-json file://$NEW_SCHEDULE_FILE &> /dev/null
 rm -f $NEW_SCHEDULE_FILE

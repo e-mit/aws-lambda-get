@@ -30,6 +30,17 @@ Parameters:
 
 Resources:
 
+  logGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupClass: STANDARD
+      RetentionInDays: 3
+      LogGroupName:
+        !Join
+        - '/'
+        - - 'lambda-log'
+          - !Ref functionName
+
   accessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -91,6 +102,9 @@ Resources:
           OnSuccess:
             Type: SQS
             Destination: !Ref queueARN
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: !Ref logGroup
 
   libs:
     Type: AWS::Serverless::LayerVersion
