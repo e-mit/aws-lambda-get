@@ -20,4 +20,3 @@ intensity = payload['data'][0]['intensity']
 assert 'forecast' in intensity
 assert 'actual' in intensity
 assert 'index' in intensity
-assert False
