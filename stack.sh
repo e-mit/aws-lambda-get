@@ -123,6 +123,11 @@ create() {
     --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides functionName=$FUNCTION_NAME $ARG3
 
+    if [[ "$?" -ne 0 ]]; then
+        aws cloudformation describe-stack-events \
+        --stack-name $STACK_NAME
+    fi
+
     aws s3 rb --force s3://$BUCKET_NAME
     echo Deleted the temporary S3 bucket
 }
