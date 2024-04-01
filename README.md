@@ -16,10 +16,11 @@ Creates an AWS Lambda function which GETs json data from an HTTP endpoint, on a 
 This project configures AWS using the CLI with a CloudFormation/SAM template. The SQS queue must already exist.
 
 
-## See also
+### See also
 
-- [https://github.com/e-mit/aws-lambda-db](https://github.com/e-mit/aws-lambda-db) creates an AWS Lambda function which receives data from a AWS SQS queue and stores it in an SQL database.
-- [https://github.com/e-mit/aws-create-db](https://github.com/e-mit/aws-create-db) creates and configures an AWS Relational Database Service (RDS) instance running PostgreSQL.
+- [github.com/e-mit/aws-lambda-db](https://github.com/e-mit/aws-lambda-db) creates an AWS Lambda function which receives data from a AWS SQS queue and stores it in an SQL database.
+- [github.com/e-mit/aws-create-db](https://github.com/e-mit/aws-create-db) creates and configures an AWS Relational Database Service (RDS) instance running PostgreSQL.
+- [github.com/e-mit/aws-ec2-grafana](https://github.com/e-mit/aws-ec2-grafana) for configuring and deploying Grafana on an EC2 instance to display a public data dashboard
 
 
 ### Readme Contents
